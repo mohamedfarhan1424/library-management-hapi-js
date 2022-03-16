@@ -55,7 +55,7 @@ const init=async ()=>{
             const username=req.payload.username;
             const password=req.payload.password;
             const login=await users.loginCheck(username,password);
-            return {login:login};
+            return login;
         }
     },
     {

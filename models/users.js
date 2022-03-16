@@ -54,9 +54,9 @@ module.exports.createUser=async function(name,email,username,password,phoneno){
 }
 
 module.exports.loginCheck=async (username,password)=>{
-    const [results,metaData]=await Connection.connect.query(`SELECT username FROM users WHERE username='${username}' AND password='${password}'`);
+    const [results,metaData]=await Connection.connect.query(`SELECT * FROM users WHERE username='${username}' AND password='${password}'`);
     if(results[0]?.username){
-        return true;
+        return {login:true,name:results[0].name,email:results[0].email,username:results[0].username,phoneno:results[0].phoneno};
     }
-    return false;
+    return {login:false};
 }
