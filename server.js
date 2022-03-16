@@ -2,6 +2,7 @@
 
 const Hapi=require('@hapi/hapi');
 const path=require('path');
+const users=require('./models/users.js');
 
 const init=async ()=>{
     const server=Hapi.Server({
@@ -11,6 +12,7 @@ const init=async ()=>{
             files: {
               relativeTo: path.join(__dirname, "static"),
             },
+            cors:true
           },
     });
 
@@ -43,16 +45,30 @@ const init=async ()=>{
         method:"GET",
         path:'/signup',
         handler:(req,res)=>{
-            return res.file('signup.html');
+            return res.view('signup',{usercreated:undefined});
         }
     },
     {
         method:"POST",
         path:'/login',
-        handler:(req,res)=>{
+        handler:async (req,res)=>{
             const username=req.payload.username;
             const password=req.payload.password;
-            return res.view('dashboard',{username,password});
+            const login=await users.loginCheck(username,password);
+            return {login:login};
+        }
+    },
+    {
+        method:"POST",
+        path:'/signup',
+        handler:async (req,res)=>{
+            const name=req.payload.name;
+            const email=req.payload.email;
+            const username=req.payload.username;
+            const password=req.payload.password;
+            const phoneno=req.payload.phoneno;
+            const usercreated=await users.createUser(name,email,username,password,phoneno);
+            return {usercreated:usercreated};
         }
     }
 ]);

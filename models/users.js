@@ -27,16 +27,36 @@ const users=dbconnection.define('users',{
         type:DataTypes.STRING
     },
     phoneno:{
-        type:DataTypes.INTEGER
+        type:DataTypes.STRING
     },
 },{
     freezeTableName:true,
     timestamps:false
 });
 
-module.exports.createUser=function(username,password){
-    users.create({username,password}).then((data)=>{
-        console.log(data.toJSON());
-    });
+
+
+module.exports.createUser=async function(name,email,username,password,phoneno){
+    users.sync();
+    const [results,metadata]=await Connection.connect.query(`SELECT username from users WHERE username='${username}'`);
+    console.log(results);
+    if(results[0]?.username){
+        console.log("hello");
+        return false;
+    }
+    else{
+        await users.create({name,email,username,password,phoneno}).then((data)=>{
+            console.log(data.toJSON());
+        });
+        return true;
+    }
+    
 }
 
+module.exports.loginCheck=async (username,password)=>{
+    const [results,metaData]=await Connection.connect.query(`SELECT username FROM users WHERE username='${username}' AND password='${password}'`);
+    if(results[0]?.username){
+        return true;
+    }
+    return false;
+}
