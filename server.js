@@ -1,51 +1,43 @@
 "use strict";
 
-const Hapi=require('@hapi/hapi');
-const path=require('path');
-const users=require('./models/users.js');
 
+const Hapi=require('@hapi/hapi');
+// const path=require('path');
+const users=require('./models/users.js');
+const books=require('./models/books.js');
 const init=async ()=>{
     const server=Hapi.Server({
         host:'localhost',
         port:8080,
         routes: {
-            files: {
-              relativeTo: path.join(__dirname, "static"),
-            },
             cors:true
+            // cors:{
+            //     origin: ['*'], // an array of origins or 'ignore'
+            // headers: ['Authorization'], // an array of strings - 'Access-Control-Allow-Headers'
+            // exposedHeaders: ['Accept'], // an array of exposed headers - 'Access-Control-Expose-Headers',
+            // additionalExposedHeaders: ['Accept'], // an array of additional exposed headers
+            // maxAge: 60,
+            // credentials: true
+            // }
           },
     });
 
-    await server.register([
-        {
-            plugin:require('@hapi/inert')
-        },
-        {
-            plugin:require('@hapi/vision')
-        }
-    ]);
+    // await server.register([
+    //     {
+    //         plugin:require('@hapi/inert')
+    //     },
+    //     {
+    //         plugin:require('@hapi/vision')
+    //     }
+    // ]);
 
-    server.views({
-        engines:{
-            hbs:require('handlebars')
-        },
-        path:path.join(__dirname,'dynamic'),
-        layout:'default',
-    })
 
     server.route([
         {
         method:"GET",
         path:'/',
         handler:(req,res)=>{
-            return res.file('welcome.html');
-        }
-    },
-    {
-        method:"GET",
-        path:'/signup',
-        handler:(req,res)=>{
-            return res.view('signup',{usercreated:undefined});
+            return "Home";
         }
     },
     {
@@ -69,6 +61,44 @@ const init=async ()=>{
             const phoneno=req.payload.phoneno;
             const usercreated=await users.createUser(name,email,username,password,phoneno);
             return {usercreated:usercreated};
+        }
+    },
+    {
+        method:"GET",
+        path:'/books',
+        handler:async (req,res)=>{
+            const books=await users.allBooks();
+            return books;
+        }
+    },
+    {
+        method:"POST",
+        path:"/createbook",
+        handler:async (req,res)=>{
+            const username=req.payload.username;
+            const bookName=req.payload.bookName;
+            const buyDate=req.payload.buyDate;
+            const returnDate=req.payload.returnDate;
+            await books.createBookTable(username,bookName,buyDate,returnDate);
+            return true;
+        }
+    },
+    {
+        method:"GET",
+        path:"/getbooktable/{username}",
+        handler:async (req,res)=>{
+            const booktable=await books.getBookTable(req.params.username);
+            return booktable;
+        }
+    },
+    {
+        method:"DELETE",
+        path:"/returnbook/{username}/{bookname}",
+        handler:async (req,res)=>{
+            const bookname=req.params.bookname;
+            const username=req.params.username;
+            books.returnBook(username,bookname);
+            return true;
         }
     }
 ]);
