@@ -5,6 +5,12 @@ const sequelize=new Sequelize('hapi_tutorial','root','@1424Farhan',{
     port:3306,
     dialect:'mysql',
 });
+
+// const sequelize=new Sequelize('sql6480066','sql6480066','Hxai4ttrur',{
+//     host:'sql6.freesqldatabase.com',
+//     port:3306,
+//     dialect:'mysql',
+// });
 module.exports.connect=sequelize;
 module.exports.getUsers=async function(){
     try{
