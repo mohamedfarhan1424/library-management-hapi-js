@@ -73,6 +73,14 @@ const init=async ()=>{
     },
     {
         method:"POST",
+        path:'/addbook',
+        handler:async (req,res)=>{
+            const result=await users.addBook(req.payload.bookname,req.payload.authorname);
+            return result;
+        }
+    },
+    {
+        method:"POST",
         path:"/createbook",
         handler:async (req,res)=>{
             const username=req.payload.username;
@@ -92,6 +100,22 @@ const init=async ()=>{
         }
     },
     {
+        method:"GET",
+        path:'/getusers',
+        handler:async (req,res)=>{
+            const allusers=await books.getAllUsers();
+            return allusers;
+        }
+    },
+    {
+        method:"DELETE",
+        path:"/deletebook/{bookname}/{authorname}",
+        handler:async (req,res)=>{
+            const result=await users.deleteBook(req.params.bookname,req.params.authorname);
+            return result;
+        }
+    },
+    {
         method:"DELETE",
         path:"/returnbook/{username}/{bookname}",
         handler:async (req,res)=>{
@@ -100,7 +124,7 @@ const init=async ()=>{
             books.returnBook(username,bookname);
             return true;
         }
-    }
+    },
 ]);
 
     await server.start();

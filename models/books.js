@@ -16,6 +16,11 @@ module.exports.returnBook=async function(username,bookname){
     const user_id=result[0].user_id;
     await Connection.connect.query(`DELETE FROM ${username} WHERE user_id=${user_id}`);
 }
+
+module.exports.getAllUsers=async ()=>{
+    const [results,metaData]=await Connection.connect.query('SELECT user_id,username FROM users WHERE username!="admin"');
+    return results;
+}
 module.exports.createBookTable=async function(username,bookName,buyDate,returnDate){
     const book=dbconnection.define(`${username}`,{
         user_id:{

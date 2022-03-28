@@ -75,15 +75,34 @@ module.exports.createUser=async function(name,email,username,password,phoneno){
     
 }
 
+
+
 module.exports.loginCheck=async (username,password)=>{
     const [results,metaData]=await Connection.connect.query(`SELECT * FROM users WHERE username='${username}' AND password='${password}'`);
-    if(results[0]?.username){
-        return {login:true,name:results[0].name,email:results[0].email,username:results[0].username,phoneno:results[0].phoneno};
+    if(results[0]?.username==='admin'){
+        return {admin:true,login:true,name:results[0].name,email:results[0].email,username:results[0].username,phoneno:results[0].phoneno};
+    }
+    else if(results[0]?.username){
+        return {admin:false,login:true,name:results[0].name,email:results[0].email,username:results[0].username,phoneno:results[0].phoneno};
     }
     return {login:false};
 }
 
-module.exports.allBooks=async (username)=>{
+
+
+module.exports.addBook=async (bookname,authorname)=>{
+    const [results,metaData]=await Connection.connect.query(`INSERT INTO books(bookname,authorname) VALUES('${bookname}','${authorname}')`);
+    return true;
+}
+
+module.exports.deleteBook=async (bookname,authorname)=>{
+    const [results,metaData]=await Connection.connect.query(`SELECT book_id FROM books WHERE bookname='${bookname}' AND authorname='${authorname}'`);
+    const book_id=results[0].book_id;
+    const [results2,metaData2]=await Connection.connect.query(`DELETE FROM books WHERE book_id='${book_id}'`);
+    return true;
+}
+
+module.exports.allBooks=async ()=>{
     const [results,metaData]=await Connection.connect.query('SELECT * FROM books');
     
     return results;
